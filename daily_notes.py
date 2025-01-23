@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
 # Returns the daily notes for a particular range of dates.
 
 from datetime import datetime
-from utils import load_json, dump_json, parse_range_str
+from .utils import load_json, dump_json, parse_range_str
 
 def daily_notes_to_cal(daily_notes):
     """
@@ -43,12 +42,12 @@ def filter_to_daily_notes(action_items, range_start, range_end):
 
     return filtered
 
-if __name__ == "__main__":
+def main_cli(args):
     import argparse
-    parser = argparse.ArgumentParser(description="Extract daily notes from action items.")
+    parser = argparse.ArgumentParser(description="Extract daily notes from action items.", prog="daily_notes")
     parser.add_argument("range", type=str, help="The range of dates to return daily notes for (`start:end`).")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     range_start, range_end = parse_range_str(args.range)
 
     action_items = load_json()

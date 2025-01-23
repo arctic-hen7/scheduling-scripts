@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
 # Script that filters next actions from `next_actions.py` down to those that match a specified
 # list of available contexts, a maximum focus level, and/or a maximum amount of available time.
 
-from utils import dump_json, load_json, validate_time, validate_focus
+from .utils import dump_json, load_json, validate_time, validate_focus
 
 def filter_next_actions(next_actions, contexts, people, max_time, max_focus):
     # TODO: sorting by relevance, somehow...
@@ -62,10 +61,10 @@ def filter_next_actions(next_actions, contexts, people, max_time, max_focus):
 
             if not we_have_all or not item_has_one: continue
         # For time and focus, we have a maximum, allow anything up to that
-        if time is not None:
-            if item["time"] > time: continue
-        if focus is not None:
-            if item["focus"] > focus: continue
+        if max_time is not None:
+            if item["time"] > max_time: continue
+        if max_focus is not None:
+            if item["focus"] > max_focus: continue
 
         filtered.append(item)
 
@@ -74,15 +73,15 @@ def filter_next_actions(next_actions, contexts, people, max_time, max_focus):
 
     return filtered
 
-if __name__ == "__main__":
+def main_cli(args):
     import argparse
-    parser = argparse.ArgumentParser(description="Filter next actions.")
+    parser = argparse.ArgumentParser(description="Filter next actions.", prog = "filter")
     parser.add_argument("-c", "--context", action="append", dest="contexts", help="Contexts to filter by (list of ORs).")
     parser.add_argument("-p", "--people", action="append", dest="people", help="People to filter by (list of ORs).")
     parser.add_argument("-f", "--focus", type=str, help="Maximum focus to filter by.")
     parser.add_argument("-t", "--time", type=str, help="Maximum time to filter by.")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     time = validate_time(args.time, "INPUT") if args.time else None
     focus = validate_focus(args.focus, "INPUT") if args.focus else None
     contexts = set(args.contexts or [])

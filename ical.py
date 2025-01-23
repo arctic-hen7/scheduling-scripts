@@ -1,12 +1,11 @@
-#!/usr/bin/env python3
 # A scheduling script that takes the object of action items from stdin and prints an ICS file
 # containing all action items with timestamps. This is intended to be composed with other scripts
 # that filter those items.
 
 import re
 from ics import Calendar, Event
-from utils import load_json, timestamp_to_datetime
-from daily_notes import daily_notes_to_cal
+from .utils import load_json, timestamp_to_datetime
+from .daily_notes import daily_notes_to_cal
 
 def cal_to_ics(cal_items):
     """
@@ -42,7 +41,7 @@ def cal_to_ics(cal_items):
 
     return ics_str
 
-if __name__ == "__main__":
+def main_cli(_):
     # We'll either have an array of calendar items, or a hybrid stream with `calendar` and
     # `daily_notes` keys
     json_data = load_json()

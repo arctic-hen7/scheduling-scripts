@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
 # Returns the "tickles" with timestamps up until a given date.
 
 from datetime import datetime
-from utils import dump_json, load_json
+from .utils import dump_json, load_json
 
 def filter_to_tickles(action_items, until):
     """
@@ -34,12 +33,12 @@ def filter_to_tickles(action_items, until):
 
     return filtered
 
-if __name__ == "__main__":
+def main_cli(args):
     import argparse
-    parser = argparse.ArgumentParser(description="Extract tickles from action items, up until a given date.")
+    parser = argparse.ArgumentParser(description="Extract tickles from action items, up until a given date.", prog="tickles")
     parser.add_argument("date", type=str, help="The date to extract tickles up until.")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     until = datetime.strptime(args.date, "%Y-%m-%d")
 
     action_items = load_json()

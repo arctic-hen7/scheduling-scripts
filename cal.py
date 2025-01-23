@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
 # Filters the given action items to a list of calendar events and scheduled work blocks.
 
-from utils import associated_people, dump_json, load_json, parse_range_str, timestamp_to_datetime, body_for_proj
+from .utils import associated_people, dump_json, load_json, parse_range_str, timestamp_to_datetime, body_for_proj
 
 def ts_in_range(ts, range_start, range_end):
     """
@@ -50,12 +49,12 @@ def filter_to_calendar(action_items, range_start, range_end):
 
     return cals
 
-if __name__ == "__main__":
+def main_cli(args):
     import argparse
-    parser = argparse.ArgumentParser(description="Convert action items to calendar events.")
+    parser = argparse.ArgumentParser(description="Convert action items to calendar events.", prog="cal")
     parser.add_argument("range", type=str, help="The range of dates to return events for (`start:end`).")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     range_start, range_end = parse_range_str(args.range)
 
     action_items = load_json()

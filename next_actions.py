@@ -1,7 +1,6 @@
-#!/usr/bin/env python3
 # Filters the given action items down to those which qualify as "next actions".
 
-from utils import associated_people, body_for_proj, create_datetime, dump_json, load_json, validate_focus, validate_time, validate_planning_ts
+from .utils import associated_people, body_for_proj, create_datetime, dump_json, load_json, validate_focus, validate_time, validate_planning_ts
 
 def filter_to_next_actions(action_items):
     """
@@ -62,6 +61,6 @@ def filter_to_next_actions(action_items):
 
     return filtered
 
-if __name__ == "__main__":
+def main_cli(_):
     action_items = load_json()
     dump_json(filter_to_next_actions(action_items))

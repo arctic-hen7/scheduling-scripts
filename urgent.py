@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
 # Script that filters the given list of upcoming next actions and projects down to those which
 # are urgent.
 
 from datetime import datetime, timedelta
-from utils import create_datetime, dump_json, load_json
+from .utils import create_datetime, dump_json, load_json
 
 def filter_to_urgent(upcoming, current_date, cutoff_date):
     """
@@ -34,13 +33,13 @@ def filter_to_urgent(upcoming, current_date, cutoff_date):
     # The upcoming filter did the ordering by deadline/scheduled for us
     return filtered
 
-if __name__ == "__main__":
+def main_cli(args):
     import argparse
-    parser = argparse.ArgumentParser(description="Filter by deadline dates to urgent items.")
+    parser = argparse.ArgumentParser(description="Filter by deadline dates to urgent items.", prog="urgent")
     parser.add_argument("-d", "--date", type=str, required=True, help="The current date to filter by.")
     parser.add_argument("-p", "--proximity", type=int, required=True, help="The number of days into the future to consider.")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     current_date = datetime.strptime(args.date, "%Y-%m-%d")
     cutoff_date = current_date + timedelta(days=args.proximity)
 

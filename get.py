@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
 # Script that gets action items from the Starling server for fitlering and display by the other
 # scripts. This also expands any repeating timestamps into multiple entries (which will have the
 # same ID), allowing later scripts to ignore that complexity.
 
 import requests
-import argparse
 import copy
 from datetime import datetime
-from utils import dump_json, timestamp_to_datetime, STARLING_API
+from .utils import dump_json, timestamp_to_datetime, STARLING_API
 
 def get_action_items(opts):
     """
@@ -196,13 +194,13 @@ def get_normalised_action_items(until, opts=[]):
 
     return expanded_items
 
-if __name__ == "__main__":
+def main_cli(args):
     import argparse
-    parser = argparse.ArgumentParser(description="Get action items from the Starling server.")
+    parser = argparse.ArgumentParser(description="Get action items from the Starling server.", prog="get")
     parser.add_argument("until", type=str, help="The date to expand timestamps up until.")
     parser.add_argument("-o", action="append", dest="opts", help="Additional arguments to be set to true (e.g. body).")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     until = datetime.strptime(args.until, "%Y-%m-%d")
 
     dump_json(get_normalised_action_items(until, args.opts or []))

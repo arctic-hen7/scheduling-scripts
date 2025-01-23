@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
 # Extract waiting-for items from the given list of action items. These can then be filtered to a
 # window of concern with the same upcoming filter used for next actions.
 
-from utils import associated_people, create_datetime, dump_json, load_json, validate_planning_ts
+from .utils import associated_people, create_datetime, dump_json, load_json, validate_planning_ts
 
 def filter_to_waiting(action_items):
     """
@@ -37,6 +36,6 @@ def filter_to_waiting(action_items):
 
     return filtered
 
-if __name__ == "__main__":
+def main_cli(_):
     action_items = load_json()
     dump_json(filter_to_waiting(action_items))

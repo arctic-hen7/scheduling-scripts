@@ -1,11 +1,10 @@
-#!/usr/bin/env python3
 # Filters the given action items down to people-related dates and displays them up until
 # a given cutoff date.
 
 import requests
 import urllib.parse
 from datetime import datetime, timedelta
-from utils import STARLING_API, load_json, dump_json
+from .utils import STARLING_API, load_json, dump_json
 
 def get_person_name(filename):
     """
@@ -82,12 +81,12 @@ def filter_to_dates(action_items, until):
 
     return filtered
 
-if __name__ == "__main__":
+def main_cli(args):
     import argparse
-    parser = argparse.ArgumentParser(description="Extract people-related dates from action items, up until a given date.")
+    parser = argparse.ArgumentParser(description="Extract people-related dates from action items, up until a given date.", prog="dates")
     parser.add_argument("date", type=str, help="The date to extract people-related dates up until.")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     until = datetime.strptime(args.date, "%Y-%m-%d")
 
     action_items = load_json()

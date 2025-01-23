@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
 # Script that filters next actions/waiting-for items down to those that are upcoming.
 
 import sys
 from datetime import datetime
-from utils import create_datetime, dump_json, load_json, timestamp_to_datetime, find_task_timestamp
+from .utils import create_datetime, dump_json, load_json, timestamp_to_datetime, find_task_timestamp
 
 def should_surface_item(item, items):
     """
@@ -86,12 +85,12 @@ def filter_to_upcoming(items, until):
 
     return filtered
 
-if __name__ == "__main__":
+def main_cli(args):
     import argparse
-    parser = argparse.ArgumentParser(description="Filter by deadline/scheduled dates to upcoming items.")
+    parser = argparse.ArgumentParser(description="Filter by deadline/scheduled dates to upcoming items.", prog="upcoming")
     parser.add_argument("date", type=str, help="The cutoff date to surface scheduled items up until.")
 
-    args = parser.parse_args()
+    args = parser.parse_args(args)
     until = datetime.strptime(args.date, "%Y-%m-%d")
 
     items = load_json()
