@@ -1,19 +1,13 @@
 #!/usr/bin/env python3
 # Returns the "tickles" with timestamps up until a given date.
 
-import json
-import sys
-import argparse
 from datetime import datetime
+from utils import dump_json, load_json
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Extract tickles from action items, up until a given date.")
-    parser.add_argument("date", type=str, help="The date to extract tickles up until.")
-
-    args = parser.parse_args()
-    until = datetime.strptime(args.date, "%Y-%m-%d")
-
-    action_items = json.loads(sys.stdin.read())
+def filter_to_tickles(action_items, until):
+    """
+    Filters the given action items to tickles with timestamps up until the given date.
+    """
 
     filtered = []
     for item in action_items:
@@ -38,4 +32,15 @@ if __name__ == "__main__":
     # Sort by date
     filtered.sort(key=lambda x: (x["date"], x["title"]))
 
-    json.dump(filtered, sys.stdout, ensure_ascii=False)
+    return filtered
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Extract tickles from action items, up until a given date.")
+    parser.add_argument("date", type=str, help="The date to extract tickles up until.")
+
+    args = parser.parse_args()
+    until = datetime.strptime(args.date, "%Y-%m-%d")
+
+    action_items = load_json()
+    dump_json(filter_to_tickles(action_items, until))

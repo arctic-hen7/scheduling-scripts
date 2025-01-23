@@ -1,20 +1,14 @@
 #!/usr/bin/env python3
+# Filters the given action items down to those which qualify as "next actions".
 
-import json
-import sys
-import argparse
-from utils import associated_people, body_for_proj, create_datetime, validate_focus, validate_time, validate_planning_ts
+from utils import associated_people, body_for_proj, create_datetime, dump_json, load_json, validate_focus, validate_time, validate_planning_ts
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Filter action items for next actions.")
-    parser.add_argument("-c/--context", action="append", dest="contexts", help="Contexts to filter by (list of ORs).")
-    parser.add_argument("-p/--people", action="append", dest="people", help="People to filter by (list of ORs).")
-    parser.add_argument("-f/--focus", type=str, help="Maximum focus to filter by.")
-    parser.add_argument("-t/--time", type=str, help="Maximum time to filter by.")
+def filter_to_next_actions(action_items):
+    """
+    Filters the given action items down to those which qualify as "next actions". These will be any
+    projects with timestamps, and any tasks.
+    """
 
-    args = parser.parse_args()
-
-    action_items = json.loads(sys.stdin.read())
     action_items = {item["id"]: item for item in action_items}
 
     filtered = []
@@ -64,7 +58,10 @@ if __name__ == "__main__":
                 "focus": focus,
             }
 
-
             filtered.append(next_action)
 
-    json.dump(filtered, sys.stdout, ensure_ascii=False)
+    return filtered
+
+if __name__ == "__main__":
+    action_items = load_json()
+    dump_json(filter_to_next_actions(action_items))

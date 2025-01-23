@@ -1,6 +1,42 @@
 from datetime import datetime
+import json
+import sys
 
 STARLING_API="http://localhost:3000/"
+
+def parse_range_str(range_str):
+    """
+    Parses a date range string of the form `start:end` into two `datetime` objects. This supports
+    absent range starts, and single dates, which will return the same date for both.
+    """
+
+    if ":" in range_str:
+        range_start, range_end = range_str.split(":")
+    else:
+        range_start = range_str
+        range_end = range_start
+
+    # It's possible to provide a range like `:X` to get only data from before that date
+    range_start = datetime.strptime(range_start, "%Y-%m-%d") if range_start else None
+    range_end = datetime.strptime(range_end, "%Y-%m-%d")
+    # Make the range end be at the *very* end of the day
+    range_end = range_end.replace(hour=23, minute=59, second=59)
+
+    return range_start, range_end
+
+def load_json():
+    """
+    Loads JSON data from stdin to allow us to filter another script's output.
+    """
+
+    return json.loads(sys.stdin.read())
+
+def dump_json(data):
+    """
+    Dumps the given JSON data to stdout so it caan be ingested by another script.
+    """
+
+    json.dump(data, sys.stdout, ensure_ascii=False)
 
 def create_datetime(date_str, time_str=None):
     """
@@ -28,7 +64,13 @@ def body_for_proj(proj_item, action_items):
     body = proj_item["body"] + "\n\n" if proj_item["body"] else ""
     task_parts = []
     for task_id, _ in proj_item["children"]:
-        task = action_items[task_id]
+        if task_id in action_items:
+            task = action_items[task_id]
+        elif f"{task_id}-0" in action_items:
+            task = action_items[f"{task_id}-0"]
+        else:
+            task = None
+
         if task:
             task_part = f"# TODO {task['title'][-1]}"
             if task["body"] and task["body"] != "":

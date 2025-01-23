@@ -2,17 +2,14 @@
 # Filters the given action items down to people-related dates and displays them up until
 # a given cutoff date.
 
-import json
-import sys
-import argparse
 import requests
 import urllib.parse
 from datetime import datetime, timedelta
-from utils import STARLING_API
+from utils import STARLING_API, load_json, dump_json
 
 def get_person_name(filename):
     """
-    Gets the name of the person described in the given file.
+    Gets the name and ID of the person described in the given file.
     """
 
     filename = urllib.parse.quote(filename, safe=[])
@@ -46,14 +43,11 @@ def parse_advance(advance_str, id):
             raise ValueError(f"Invalid advance string in date {id}: {advance_str}")
     return advance
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Extract people-related dates from action items, up until a given date.")
-    parser.add_argument("date", type=str, help="The date to extract people-related dates up until.")
-
-    args = parser.parse_args()
-    until = datetime.strptime(args.date, "%Y-%m-%d")
-
-    action_items = json.loads(sys.stdin.read())
+def filter_to_dates(action_items, until):
+    """
+    Filters the given action items to important dates about people. This will return all those
+    dates whose advance warning periods fall before the given `until` date.
+    """
 
     filtered = []
     for item in action_items:
@@ -86,4 +80,15 @@ if __name__ == "__main__":
     # Sort by date
     filtered.sort(key=lambda x: (x["date"], x["title"], x["person"][0]))
 
-    json.dump(filtered, sys.stdout, ensure_ascii=False)
+    return filtered
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Extract people-related dates from action items, up until a given date.")
+    parser.add_argument("date", type=str, help="The date to extract people-related dates up until.")
+
+    args = parser.parse_args()
+    until = datetime.strptime(args.date, "%Y-%m-%d")
+
+    action_items = load_json()
+    dump_json(filter_to_dates(action_items, until))

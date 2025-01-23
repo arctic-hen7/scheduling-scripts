@@ -5,11 +5,9 @@
 
 import requests
 import argparse
-from datetime import datetime
 import copy
-from utils import timestamp_to_datetime, STARLING_API
-import sys
-import json
+from datetime import datetime
+from utils import dump_json, timestamp_to_datetime, STARLING_API
 
 def get_action_items(opts):
     """
@@ -152,15 +150,17 @@ def prune_inactive_ts(ts):
         del ts["active"]
         return ts
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Get action items from the Starling server.")
-    parser.add_argument("until", type=str, help="The date to expand timestamps up until.")
-    parser.add_argument("-o", action="append", dest="opts", help="Additional arguments to be set to true (e.g. body).")
+def get_normalised_action_items(until, opts=[]):
+    """
+    Gets the list of action items from Starling, extracting and repeating any timestamps so the
+    caller doesn't have to worry about multiple or repeating timestamps. This will also entirely
+    remove inactive timestamps.
 
-    args = parser.parse_args()
-    until = datetime.strptime(args.until, "%Y-%m-%d")
+    This will repeat timestamps until the given `until` date. This also takes an array of
+    parameters to set to `true` when getting the data from the server (e.g. `body`).
+    """
 
-    items = get_action_items({key: True for key in args.opts or []})
+    items = get_action_items({key: True for key in opts})
 
     # Expand every timestamp to avoid handling the complexities of repeats later
     expanded_items = []
@@ -194,4 +194,15 @@ if __name__ == "__main__":
             item["metadata"]["timestamp"] = None
             expanded_items.extend(repeat_until(item, until))
 
-    json.dump(expanded_items, sys.stdout, ensure_ascii=False)
+    return expanded_items
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Get action items from the Starling server.")
+    parser.add_argument("until", type=str, help="The date to expand timestamps up until.")
+    parser.add_argument("-o", action="append", dest="opts", help="Additional arguments to be set to true (e.g. body).")
+
+    args = parser.parse_args()
+    until = datetime.strptime(args.until, "%Y-%m-%d")
+
+    dump_json(get_normalised_action_items(until, args.opts or []))

@@ -2,27 +2,33 @@
 # Script that filters next actions from `next_actions.py` down to those that match a specified
 # list of available contexts, a maximum focus level, and/or a maximum amount of available time.
 
-# TODO: sorting by relevance, somehow...
+from utils import dump_json, load_json, validate_time, validate_focus
 
-import json
-import sys
-import argparse
-from utils import validate_time, validate_focus
+def filter_next_actions(next_actions, contexts, people, max_time, max_focus):
+    # TODO: sorting by relevance, somehow...
+    """
+    Filters the given next actions by context, time required, focus required, and people needed.
+    This is very different from `filter_to_next_actions`, which turns action items into next
+    actions, which can *then* be filtered with this function!
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Filter next actions.")
-    parser.add_argument("-c", "--context", action="append", dest="contexts", help="Contexts to filter by (list of ORs).")
-    parser.add_argument("-p", "--people", action="append", dest="people", help="People to filter by (list of ORs).")
-    parser.add_argument("-f", "--focus", type=str, help="Maximum focus to filter by.")
-    parser.add_argument("-t", "--time", type=str, help="Maximum time to filter by.")
+    The given list of contexts will be taken as the list of contexts which are available, so
+    tasks which have contexts not in this list will be filtered out, as well as tasks which have
+    none of those contexts (when the list is non-empty, this will be items without a context,
+    which are typically person-associated).
 
-    args = parser.parse_args()
-    contexts = set(args.contexts or [])
-    people = set(args.people or [])
-    time = validate_time(args.time, "INPUT") if args.time else None
-    focus = validate_focus(args.focus, "INPUT") if args.focus else None
+    The given list of people will be taken as the list of people available, and will be treated
+    identically to the list of contexts.
 
-    next_actions = json.loads(sys.stdin.read())
+    The given maximum time should be a number of minutes, and tasks requiring longer than this will
+    be filtered out.
+
+    The given maximum focus should be a number from 0-3, and tasks requiring more focus than this
+    will be filtered out.
+    """
+
+    # We want quick indexing on these
+    contexts = set(contexts)
+    people = set(people)
 
     filtered = []
     for item in next_actions:
@@ -66,4 +72,21 @@ if __name__ == "__main__":
     # Sort by title
     filtered.sort(key=lambda item: item["title"])
 
-    json.dump(filtered, sys.stdout, ensure_ascii=False)
+    return filtered
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Filter next actions.")
+    parser.add_argument("-c", "--context", action="append", dest="contexts", help="Contexts to filter by (list of ORs).")
+    parser.add_argument("-p", "--people", action="append", dest="people", help="People to filter by (list of ORs).")
+    parser.add_argument("-f", "--focus", type=str, help="Maximum focus to filter by.")
+    parser.add_argument("-t", "--time", type=str, help="Maximum time to filter by.")
+
+    args = parser.parse_args()
+    time = validate_time(args.time, "INPUT") if args.time else None
+    focus = validate_focus(args.focus, "INPUT") if args.focus else None
+    contexts = set(args.contexts or [])
+    people = set(args.people or [])
+
+    next_actions = load_json()
+    dump_json(filter_next_actions(next_actions, contexts or [], people or [], time, focus))

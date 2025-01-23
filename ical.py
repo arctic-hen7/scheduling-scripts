@@ -3,14 +3,15 @@
 # containing all action items with timestamps. This is intended to be composed with other scripts
 # that filter those items.
 
-import sys
-from ics import Calendar, Event
-import json
 import re
-from utils import timestamp_to_datetime
+from ics import Calendar, Event
+from utils import load_json, timestamp_to_datetime
+from daily_notes import daily_notes_to_cal
 
-if __name__ == "__main__":
-    cal_items = json.loads(sys.stdin.read())
+def cal_to_ics(cal_items):
+    """
+    Converts the given list of action items to an ICS calendar string.
+    """
 
     calendar = Calendar()
     for item in cal_items:
@@ -39,4 +40,17 @@ if __name__ == "__main__":
     ics_str = re.sub(r'(DTSTART:\d+T\d+)Z', r'\1', ics_str)
     ics_str = re.sub(r'(DTEND:\d+T\d+)Z', r'\1', ics_str)
 
+    return ics_str
+
+if __name__ == "__main__":
+    # We'll either have an array of calendar items, or a hybrid stream with `calendar` and
+    # `daily_notes` keys
+    json_data = load_json()
+    if isinstance(json_data, dict):
+        cal_items = json_data["calendar"]
+        cal_items.append(daily_notes_to_cal(json_data["daily_notes"]))
+    else:
+        cal_items = json_data
+
+    ics_str = cal_to_ics(cal_items)
     print(ics_str)

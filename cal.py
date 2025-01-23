@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # Filters the given action items to a list of calendar events and scheduled work blocks.
 
-import json
-import sys
-import argparse
-from utils import associated_people, timestamp_to_datetime, body_for_proj
-from datetime import datetime
+from utils import associated_people, dump_json, load_json, parse_range_str, timestamp_to_datetime, body_for_proj
 
 def ts_in_range(ts, range_start, range_end):
     """
@@ -16,25 +12,11 @@ def ts_in_range(ts, range_start, range_end):
     ts_end = ts_end or ts_start
     return (range_start and ts_start <= range_end and ts_end >= range_start) or (not range_start and ts_start <= range_end)
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert action items to calendar events.")
-    parser.add_argument("range", type=str, help="The range of dates to return events for (`start:end`).")
-
-    args = parser.parse_args()
-    if ":" in args.range:
-        range_start, range_end = args.range.split(":")
-    else:
-        range_start = args.range
-        range_end = range_start
-
-    # It's possible to provide a range like `:X` to get only events from before that date
-    # which haven't yet been marked as done
-    range_start = datetime.strptime(range_start, "%Y-%m-%d") if range_start else None
-    range_end = datetime.strptime(range_end, "%Y-%m-%d")
-    # Make the range end be at the *very* end of the day
-    range_end = range_end.replace(hour=23, minute=59, second=59)
-
-    action_items = json.loads(sys.stdin.read())
+def filter_to_calendar(action_items, range_start, range_end):
+    """
+    Filters the given action items to events and scheduled work blocks in the given datetime range.
+    If you want to filter between days, make sure `range_end` has a time ending at 23:59.
+    """
     action_items = {item["id"]: item for item in action_items}
 
     # Get all the items with a timestamp, and insert them as many times as they have timestamps
@@ -66,4 +48,15 @@ if __name__ == "__main__":
     # Sort by start date, then start time, then title
     cals.sort(key=lambda x: (x["start"]["date"], x["start"]["time"] or "00:00", x["title"]))
 
-    json.dump(cals, sys.stdout, ensure_ascii=False)
+    return cals
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Convert action items to calendar events.")
+    parser.add_argument("range", type=str, help="The range of dates to return events for (`start:end`).")
+
+    args = parser.parse_args()
+    range_start, range_end = parse_range_str(args.range)
+
+    action_items = load_json()
+    dump_json(filter_to_calendar(action_items, range_start, range_end))

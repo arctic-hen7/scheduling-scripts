@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
-# Script that filters next actions down to those that are upcoming. This will surface items with
-# a scheduled date before the given cutoff, as well as any items with a deadline at any time. In
-# both cases, it will first check to ensure the item or its project parent doesn't have a timestamp
-# set for when to work on it (the user is considered to have handled these, so surfacing them
-# would just be clutter).
-#
-# This can work with both next actions and waiting-for items; technically anything with `scheduled`
-# and/or `deadline` dates.
+# Script that filters next actions/waiting-for items down to those that are upcoming.
 
-import json
 import sys
-import argparse
 from datetime import datetime
-from utils import create_datetime, timestamp_to_datetime, find_task_timestamp
+from utils import create_datetime, dump_json, load_json, timestamp_to_datetime, find_task_timestamp
 
 def should_surface_item(item, items):
     """
@@ -44,14 +35,18 @@ def should_surface_item(item, items):
     else:
         return True
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Filter by deadline/scheduled dates to upcoming items.")
-    parser.add_argument("date", type=str, help="The cutoff date to surface scheduled items up until.")
+def filter_to_upcoming(items, until):
+    """
+    Filters the given next actions down to those which are upcoming with respect to the given date.
+    Specifically, this will surface items with a scheduled date before the given cutoff, as well as
+    any items with a deadline at any time. In both cases, it will first check to ensure the item or
+    its project parent doesn't have a timestamp set for when to work on it (the user is considered
+    to have handled these, so surfacing them would just be clutter).
 
-    args = parser.parse_args()
-    until = datetime.strptime(args.date, "%Y-%m-%d")
+    This can work with both next actions and waiting-for items; technically anything with `scheduled`
+    and/or `deadline` dates.
+    """
 
-    items = json.loads(sys.stdin.read())
     items = {item["id"]: item for item in items}
 
     filtered = []
@@ -89,4 +84,15 @@ if __name__ == "__main__":
             )
     )
 
-    json.dump(filtered, sys.stdout, ensure_ascii=False)
+    return filtered
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description="Filter by deadline/scheduled dates to upcoming items.")
+    parser.add_argument("date", type=str, help="The cutoff date to surface scheduled items up until.")
+
+    args = parser.parse_args()
+    until = datetime.strptime(args.date, "%Y-%m-%d")
+
+    items = load_json()
+    dump_json(filter_to_upcoming(items, until))

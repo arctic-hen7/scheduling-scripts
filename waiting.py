@@ -2,12 +2,12 @@
 # Extract waiting-for items from the given list of action items. These can then be filtered to a
 # window of concern with the same upcoming filter used for next actions.
 
-import json
-import sys
-from utils import associated_people, create_datetime, validate_planning_ts
+from utils import associated_people, create_datetime, dump_json, load_json, validate_planning_ts
 
-if __name__ == "__main__":
-    action_items = json.loads(sys.stdin.read())
+def filter_to_waiting(action_items):
+    """
+    Filters the given action items down to those which qualify as "waiting-for" items.
+    """
 
     filtered = []
     for item in action_items:
@@ -35,4 +35,8 @@ if __name__ == "__main__":
             }
             filtered.append(wait_item)
 
-    json.dump(filtered, sys.stdout, ensure_ascii=False)
+    return filtered
+
+if __name__ == "__main__":
+    action_items = load_json()
+    dump_json(filter_to_waiting(action_items))
