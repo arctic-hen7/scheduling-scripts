@@ -47,7 +47,7 @@ def main_cli(_):
     json_data = load_json()
     if isinstance(json_data, dict):
         cal_items = json_data["calendar"]
-        cal_items.append(daily_notes_to_cal(json_data["daily_notes"]))
+        cal_items.extend(daily_notes_to_cal(json_data["daily_notes"]))
     else:
         cal_items = json_data
 

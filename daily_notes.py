@@ -1,15 +1,42 @@
 # Returns the daily notes for a particular range of dates.
 
 from datetime import datetime
+import uuid
 from .utils import load_json, dump_json, parse_range_str
 
 def daily_notes_to_cal(daily_notes):
     """
-    Converts the given daily notes to a calendar item, allowing them to be placed in the calendar
-    as an all-day informational event.
+    Converts the given daily notes to a calendar item for each date, allowing them to be placed in
+    the calendar as all-day informational events.
     """
 
-    return {}
+    if not daily_notes:
+        return []
+
+    cal_items = {}
+    for note in daily_notes:
+        if note["date"] not in cal_items:
+            cal_items[note["date"]] = {
+                "id": uuid.uuid4().hex,
+                "title": "📍 Daily information",
+                "body": "",
+                "location": None,
+                "people": [],
+                "start": {
+                    "date": note["date"],
+                    "time": None,
+                },
+                "end": None
+            }
+
+        body = note["body"].replace("\\$", "$")
+        cal_items[note["date"]]["body"] += f"# {note['title']}\n{body}\n\n"
+
+    cal_items = list(cal_items.values())
+    for cal_item in cal_items:
+        cal_item["body"] = cal_item["body"].strip()
+
+    return cal_items
 
 def filter_to_daily_notes(action_items, range_start, range_end):
     """
