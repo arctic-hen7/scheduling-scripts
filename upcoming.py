@@ -92,6 +92,7 @@ def main_cli(args):
 
     args = parser.parse_args(args)
     until = datetime.strptime(args.date, "%Y-%m-%d")
+    until.replace(hour=23, minute=59, second=59)
 
     items = load_json()
     dump_json(filter_to_upcoming(items, until))

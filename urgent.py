@@ -42,6 +42,7 @@ def main_cli(args):
     args = parser.parse_args(args)
     current_date = datetime.strptime(args.date, "%Y-%m-%d")
     cutoff_date = current_date + timedelta(days=args.proximity)
+    cutoff_date.replace(hour=23, minute=59, second=59)
 
     upcoming = load_json()
     dump_json(filter_to_urgent(upcoming, current_date, cutoff_date))

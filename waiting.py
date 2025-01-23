@@ -25,7 +25,7 @@ def filter_to_waiting(action_items):
 
             wait_item = {
                 "id": item["id"],
-                "title": item["title"],
+                "title": item["title"][-1],
                 "body": item["body"],
                 "scheduled": scheduled,
                 "deadline": deadline,

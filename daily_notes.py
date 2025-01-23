@@ -31,7 +31,7 @@ def filter_to_daily_notes(action_items, range_start, range_end):
                 if (range_start and range_start <= date <= range_end) or (not range_start and date <= range_end):
                     note_item = {
                         "id": item["id"],
-                        "title": item["title"],
+                        "title": item["title"][-1],
                         "body": (item["body"] or "").strip(),
                         "date": ts["start"]["date"],
                     }

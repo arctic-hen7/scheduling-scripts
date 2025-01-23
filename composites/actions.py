@@ -31,5 +31,5 @@ def main_cli(args):
     next_actions = filter_to_next_actions(action_items)
     filtered = filter_next_actions(next_actions, args.contexts or [], args.people or [], time, focus)
 
-    display = display_actions(filtered, date)
+    display = display_actions(filtered, date.date())
     rich_print(display)

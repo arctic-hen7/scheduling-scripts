@@ -84,8 +84,6 @@ def main_cli(args):
     args = parser.parse_args(args)
     time = validate_time(args.time, "INPUT") if args.time else None
     focus = validate_focus(args.focus, "INPUT") if args.focus else None
-    contexts = set(args.contexts or [])
-    people = set(args.people or [])
 
     next_actions = load_json()
-    dump_json(filter_next_actions(next_actions, contexts or [], people or [], time, focus))
+    dump_json(filter_next_actions(next_actions, args.contexts or [], args.people or [], time, focus))

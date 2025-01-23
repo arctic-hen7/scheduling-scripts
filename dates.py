@@ -67,7 +67,7 @@ def filter_to_dates(action_items, until):
                 if notify_date <= until:
                     tickle_item = {
                         "id": item["id"],
-                        "title": item["title"],
+                        "title": item["title"][-1],
                         "body": (item["body"] or "").strip(),
                         "date": ts["start"]["date"],
                         # We could just use the first element of the title, but that wouldn't get us

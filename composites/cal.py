@@ -1,9 +1,11 @@
 # A composite for accumulating calendar and daily note info and displaying it.
 
+from rich import print as rich_print
 from ..cal import filter_to_calendar
 from ..daily_notes import filter_to_daily_notes
 from ..get import get_normalised_action_items
-from ..utils import parse_range_str, dump_json
+from ..dashboards.cal import display_calendar
+from ..utils import parse_range_str
 
 def main_cli(args):
     import argparse
@@ -17,7 +19,5 @@ def main_cli(args):
     cal_items = filter_to_calendar(action_items, range_start, range_end)
     daily_notes = filter_to_daily_notes(action_items, range_start, range_end)
 
-    dump_json({
-        "calendar": cal_items,
-        "daily_notes": daily_notes,
-    })
+    cal_display = display_calendar(cal_items, daily_notes)
+    rich_print(cal_display)

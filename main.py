@@ -4,9 +4,9 @@
 import sys
 from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
-from scheduling_scripts import cal, daily_notes, dates, filter, gcal, get, ical, next_actions, tickle, upcoming, urgent, waiting, dashboards
+from scheduling_scripts import cal, daily_notes, dates, filter, gcal, get, ical, next_actions, tickles, upcoming, urgent, waiting
 from scheduling_scripts.dashboards import actions as d_actions
-from scheduling_scripts.composites import cal as c_cal, actions as c_actions
+from scheduling_scripts.composites import cal as c_cal, actions as c_actions, upcoming as c_upcoming, urgent as c_urgent, waiting as c_waiting, tickles as c_tickles, dates as c_dates
 
 # This script acts as the central script endpoint for everything in the scheduling scripts. It
 # can be executed with just `python main.py` due to the above `sys.path` modification, and it
@@ -28,7 +28,7 @@ ARGS = {
         "get": get.main_cli,
         "ical": ical.main_cli,
         "next_actions": next_actions.main_cli,
-        "tickle": tickle.main_cli,
+        "tickles": tickles.main_cli,
         "upcoming": upcoming.main_cli,
         "urgent": urgent.main_cli,
         "waiting": waiting.main_cli,
@@ -39,6 +39,11 @@ ARGS = {
     },
     "cal": c_cal.main_cli,
     "actions": c_actions.main_cli,
+    "upcoming": c_upcoming.main_cli,
+    "urgent": c_urgent.main_cli,
+    "waiting": c_waiting.main_cli,
+    "tickles": c_tickles.main_cli,
+    "dates": c_dates.main_cli,
 }
 
 if __name__ == "__main__":

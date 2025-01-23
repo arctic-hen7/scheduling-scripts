@@ -22,7 +22,7 @@ def filter_to_tickles(action_items, until):
                 if date <= until:
                     tickle_item = {
                         "id": item["id"],
-                        "title": item["title"],
+                        "title": item["title"][-1],
                         "body": (item["body"] or "").strip(),
                         "date": ts["start"]["date"],
                     }
