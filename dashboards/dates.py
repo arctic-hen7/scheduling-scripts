@@ -33,6 +33,9 @@ def display_dates(dates, current_date):
             # manually
             yield Text("")
 
+    if not dates:
+        yield Text.from_markup("[red italic]No important dates found.[/red italic]")
+
 def main_cli(args):
     import argparse
     parser = argparse.ArgumentParser(description="Display important dates.", prog="date")

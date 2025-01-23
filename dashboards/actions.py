@@ -71,6 +71,9 @@ def display_actions(actions, current_date):
             # manually
             yield Text("")
 
+    if not actions:
+        yield Text.from_markup("[red italic]No actions found.[/red italic]")
+
 def main_cli(args):
     import argparse
     parser = argparse.ArgumentParser(description="Display next actions.", prog="actions")

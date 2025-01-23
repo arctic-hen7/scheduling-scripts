@@ -19,6 +19,7 @@ def main_cli(args):
     args = parser.parse_args(args)
     current_date = datetime.strptime(args.date, "%Y-%m-%d") if args.date else datetime.now()
     cutoff_date = current_date + timedelta(days=args.proximity)
+    current_date.replace(hour=0, minute=0, second=0)
     cutoff_date.replace(hour=23, minute=59, second=59)
 
     action_items = get_normalised_action_items(cutoff_date, ["body"])

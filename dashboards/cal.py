@@ -121,6 +121,9 @@ def display_calendar(cal_items, daily_notes):
                 # manually
                 yield Text("")
 
+    if not dates:
+        yield Text.from_markup("[red italic]No events or daily notes in the given range.[/red italic]")
+
 
 def main_cli(_):
     data = json.loads(sys.stdin.read())

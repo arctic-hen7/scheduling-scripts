@@ -31,6 +31,9 @@ def display_tickles(tickles, current_date):
             # manually
             yield Text("")
 
+    if not tickles:
+        yield Text.from_markup("[red italic]No tickles found.[/red italic]")
+
 def main_cli(args):
     import argparse
     parser = argparse.ArgumentParser(description="Display tickles.", prog="tickles")
