@@ -22,8 +22,10 @@ def main_cli(args):
     parser.add_argument("-t", "--time", type=str, help="Maximum time to filter by.")
 
     args = parser.parse_args(args)
-    date = datetime.strptime(args.date, "%Y-%m-%d") if args.date else datetime.now().date()
+    date = datetime.strptime(args.date, "%Y-%m-%d") if args.date else datetime.now()
     until = datetime.strptime(args.until, "%Y-%m-%d") if args.until else date + timedelta(days=EXPAND_ADVANCE_DAYS)
+    date.replace(hour=0, minute=0, second=0)
+    until.replace(hour=23, minute=59, second=59)
     time = validate_time(args.time, "INPUT") if args.time else None
     focus = validate_focus(args.focus, "INPUT") if args.focus else None
 
@@ -31,5 +33,5 @@ def main_cli(args):
     next_actions = filter_to_next_actions(action_items)
     filtered = filter_next_actions(next_actions, args.contexts or [], args.people or [], time, focus)
 
-    display = display_actions(filtered, date)
+    display = display_actions(filtered, date.date())
     rich_print(display)
