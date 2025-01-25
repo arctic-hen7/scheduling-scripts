@@ -129,6 +129,8 @@ const parseTimeStr = (timeStr) => {
 
 // Same as `filter.py:filter_next_actions`.
 const filter = (date, contextsArr, peopleArr, maxTimeStr, maxFocus) => {
+    date.setHours(0, 0, 0, 0);
+
     const contexts = contextsArr
         ? new Set(contextsArr.map((ctx) => CONTEXTS.indexOf(ctx)))
         : null;
