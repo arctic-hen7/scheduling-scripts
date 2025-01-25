@@ -2,6 +2,8 @@
 
 from datetime import datetime, timedelta
 from rich import print as rich_print
+
+from ..upcoming import filter_to_upcoming
 from ..urgent import filter_to_urgent
 from ..dashboards.actions import display_actions
 from ..next_actions import filter_to_next_actions
@@ -24,7 +26,8 @@ def main_cli(args):
 
     action_items = get_normalised_action_items(cutoff_date, ["body"])
     next_actions = filter_to_next_actions(action_items)
-    urgent = filter_to_urgent(next_actions, current_date, cutoff_date)
+    upcoming = filter_to_upcoming(next_actions, cutoff_date)
+    urgent = filter_to_urgent(upcoming, current_date, cutoff_date)
 
     display = display_actions(urgent, current_date.date())
     rich_print(display)
