@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Field Actions Dashboard</title>
+        <meta http-equiv="Expires" content="-1" />
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="">
+        <style>
+            {{ styles }}
+        </style>
+        <script id="actionsData" type="application/json">
+            {{ data }}
+        </script>
+    </head>
+    <body>
+        <div class="searchBar">
+            <div class="searchField">
+                <span>Contexts:</span>
+                <select id="contextsSelect" multiple></select>
+            </div>
+            <div class="searchField">
+                <span>People:</span>
+                <select id="peopleSelect" multiple></select>
+            </div>
+            <div class="searchField">
+                <span>Time:</span>
+                <input id="time" type="text" placeholder="Maximum time" />
+            </div>
+            <div class="searchField">
+                <span>Focus:</span>
+                <select id="focus">
+                    <option value="-1">None</option>
+                    <option value="0">Minimal</option>
+                    <option value="1">Low</option>
+                    <option value="2">Medium</option>
+                    <option value="3">High</option>
+                </select>
+            </div>
+            <button id="filterButton" onClick="doFilter()">Filter!</button>
+        </div>
+        <div id="actions"></div>
+        <script type="text/javascript">
+            {{ scripts }}
+        </script>
+    </body>
+</html>

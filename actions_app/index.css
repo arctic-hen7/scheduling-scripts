@@ -1,0 +1,42 @@
+.scheduled {
+    color: #d75f00;
+}
+.deadline {
+    color: red;
+}
+.context {
+    color: blue;
+}
+.time {
+    color: #0087ff;
+}
+.focus {
+    color: #00d700;
+}
+
+pre {
+    white-space: pre-wrap;
+}
+
+.searchBar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.searchField {
+    display: flex;
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+.searchField > span {
+    margin-right: 1rem;
+}
+.searchField > input, .searchField > select {
+    padding: 0.5rem;
+}
+
+#filterButton {
+    padding: 0.5rem 3rem 0.5rem 3rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
