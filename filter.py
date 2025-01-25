@@ -1,7 +1,7 @@
 # Script that filters next actions from `next_actions.py` down to those that match a specified
 # list of available contexts, a maximum focus level, and/or a maximum amount of available time.
 
-from .utils import dump_json, load_json, validate_time, validate_focus
+from .utils import dump_json, load_json, validate_time, validate_focus, should_surface_item
 
 def filter_next_actions(next_actions, contexts, people, max_time, max_focus):
     # TODO: sorting by relevance, somehow...
@@ -28,9 +28,16 @@ def filter_next_actions(next_actions, contexts, people, max_time, max_focus):
     # We want quick indexing on these
     contexts = set(contexts)
     people = set(people)
+    next_actions = {item["id"]: item for item in next_actions}
 
     filtered = []
-    for item in next_actions:
+    for item in next_actions.values():
+        # Skip anything that's been scheduled, any projects, and any non-actionable items. They
+        # should all be visible in the desktop systems, because there I can see the full context
+        # of where they sit and work out what needs to be done. In the field, I just want to see
+        # things I can *do* straight away.
+        if not should_surface_item(item, next_actions) or not item["time"] or item["keyword"] != "TODO":
+            continue
         # Skip all projects, they're not next actions and are only needed in the upcoming/urgent
         # sections
         if not item["time"]: continue

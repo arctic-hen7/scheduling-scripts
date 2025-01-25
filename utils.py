@@ -178,3 +178,33 @@ def validate_planning_ts(ts, item_id):
         raise ValueError(f"Planning timestamp on item {item_id} spans a range, which is not allowed")
 
     return ts["start"]
+
+def should_surface_item(item, items):
+    """
+    Checks if the given item, or its project parent (if it has one) has a timestamp that would
+    mean it doesn't need to be surfaced in the upcoming list. If it does, this will also make
+    sure that timestamp makes sense with the item's deadline, if it has one.
+
+    This returns `True` if the item should be surfaced, and `False` if it should not, and it
+    will write a warning to stderr if the timestamp would not meet the deadline.
+    """
+
+    ts = find_task_timestamp(item, items)
+    if ts and item["deadline"]:
+        # We have a timestamp and a deadline it needs to come before
+        deadline = create_datetime(item["deadline"]["date"], item["deadline"]["time"])
+        ts_start, ts_end = timestamp_to_datetime(ts)
+        # Deliberate `<` here; if the user starts *at* the deadline, that is pretty dumb
+        if ts_start < deadline and (ts_end is None or ts_end <= deadline):
+            # It does, the schedule is valid, we don't need to surface it
+            return False
+        else:
+            # Bad schedule, warn the user! (stderr because stdout is for the JSON)
+            sys.stderr.write(f"Warning: Scheduled item {item['id']} has a deadline you won't meet under current schedule!\n")
+            return False
+    elif ts:
+        # If there's no deadline date to adhere to, but we have slated this to work on at
+        # some stage, it doesn't need to be surfaced
+        return False
+    else:
+        return True

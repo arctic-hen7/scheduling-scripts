@@ -6,24 +6,8 @@ from rich.markdown import Markdown
 from rich.padding import Padding
 from rich.text import Text
 from rich import print as rich_print
-from .utils import LeftJustifiedHeading, format_date
+from .utils import LeftJustifiedHeading, format_date, format_minutes
 from ..utils import load_json
-
-def format_minutes(minutes):
-    """
-    Formats the given number of minutes into a string of the form `Xhr Ym` as sensible.
-    """
-
-    hours = minutes // 60
-    remaining_minutes = minutes % 60
-    result = []
-
-    if hours > 0:
-        result.append(f"{hours}hr")
-    if remaining_minutes > 0:
-        result.append(f"{remaining_minutes}m")
-
-    return " ".join(result) if result else "0m"
 
 @group()
 def display_actions(actions, current_date):

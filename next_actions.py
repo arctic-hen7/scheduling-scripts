@@ -46,6 +46,7 @@ def filter_to_next_actions(action_items):
             next_action = {
                 "id": item["id"],
                 "parent_id": item["parent_id"],
+                "keyword": item["metadata"]["keyword"],
                 "title": item["title"][-1],
                 "body": body.strip(),
                 "scheduled": validate_planning_ts(item["metadata"]["scheduled"], item["id"]),

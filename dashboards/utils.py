@@ -59,3 +59,19 @@ class LeftJustifiedHeading(TextElement):
         text = self.text
         text.justify = "left"
         yield Text(f"{' ' * (self.level - 1)}→ {text}")
+
+def format_minutes(minutes):
+    """
+    Formats the given number of minutes into a string of the form `Xhr Ym` as sensible.
+    """
+
+    hours = minutes // 60
+    remaining_minutes = minutes % 60
+    result = []
+
+    if hours > 0:
+        result.append(f"{hours}hr")
+    if remaining_minutes > 0:
+        result.append(f"{remaining_minutes}m")
+
+    return " ".join(result) if result else "0m"
