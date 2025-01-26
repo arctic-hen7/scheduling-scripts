@@ -1,9 +1,10 @@
 # Script that filters next actions from `next_actions.py` down to those that match a specified
 # list of available contexts, a maximum focus level, and/or a maximum amount of available time.
 
+from datetime import datetime
 from .utils import dump_json, load_json, validate_time, validate_focus, should_surface_item
 
-def filter_next_actions(next_actions, contexts, people, max_time, max_focus):
+def filter_next_actions(next_actions, until, contexts, people, max_time, max_focus):
     # TODO: sorting by relevance, somehow...
     """
     Filters the given next actions by context, time required, focus required, and people needed.
@@ -41,6 +42,8 @@ def filter_next_actions(next_actions, contexts, people, max_time, max_focus):
         # Skip all projects, they're not next actions and are only needed in the upcoming/urgent
         # sections
         if not item["time"]: continue
+        # Skip anything scheduled after the current date (shouldn't be started yet)
+        if item["scheduled"] and datetime.strptime(item["scheduled"]["date"], "%Y-%m-%d") > until: continue
 
         # If we're filtering by context, this item's list of contexts is an AND list, so make sure
         # all of them are available in `contexts`, and exclude items that don't have any
@@ -92,14 +95,16 @@ def filter_next_actions(next_actions, contexts, people, max_time, max_focus):
 def main_cli(args):
     import argparse
     parser = argparse.ArgumentParser(description="Filter next actions.", prog = "filter")
+    parser.add_argument("-u", "--until", type=str, required=True, help="The date to show scheduled actions until.")
     parser.add_argument("-c", "--context", action="append", dest="contexts", help="Contexts to filter by (list of ORs).")
     parser.add_argument("-p", "--people", action="append", dest="people", help="People to filter by (list of ORs).")
     parser.add_argument("-f", "--focus", type=str, help="Maximum focus to filter by.")
     parser.add_argument("-t", "--time", type=str, help="Maximum time to filter by.")
 
     args = parser.parse_args(args)
+    until = datetime.strptime(args.until, "%Y-%m-%d")
     time = validate_time(args.time, "INPUT") if args.time else None
     focus = validate_focus(args.focus, "INPUT") if args.focus else None
 
     next_actions = load_json()
-    dump_json(filter_next_actions(next_actions, args.contexts or [], args.people or [], time, focus))
+    dump_json(filter_next_actions(next_actions, until, args.contexts or [], args.people or [], time, focus))

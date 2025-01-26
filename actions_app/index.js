@@ -131,6 +131,9 @@ const parseTimeStr = (timeStr) => {
 const filter = (date, contextsArr, peopleArr, maxTimeStr, maxFocus) => {
     date.setHours(0, 0, 0, 0);
 
+    const until = new Date(date);
+    until.setHours(23, 59, 59, 999);
+
     const contexts = contextsArr
         ? new Set(contextsArr.map((ctx) => CONTEXTS.indexOf(ctx)))
         : null;
@@ -183,6 +186,17 @@ const filter = (date, contextsArr, peopleArr, maxTimeStr, maxFocus) => {
 
         let fullHtml = html;
         if (scheduled) {
+            const scheduledDate = scheduled
+                ? new Date(
+                    `${scheduled[0]}T${
+                        scheduled[1] ? scheduled[1] : "00:00:00"
+                    }`,
+                )
+                : null;
+            if (scheduledDate && scheduledDate > date) {
+                continue;
+            }
+
             const scheduledReadable = formatDate(
                 scheduled[0],
                 scheduled[1],
