@@ -16,11 +16,11 @@ def filter_to_calendar(action_items, range_start, range_end):
     Filters the given action items to events and scheduled work blocks in the given datetime range.
     If you want to filter between days, make sure `range_end` has a time ending at 23:59.
     """
-    action_items = {item["id"]: item for item in action_items}
+    action_items_map = {item["id"]: item for item in action_items}
 
     # Get all the items with a timestamp, and insert them as many times as they have timestamps
     cals = []
-    for item in action_items.values():
+    for item in action_items:
         # Strip out dates associated with people (e.g. birthdays), daily info items, and tickles
         if "person_dates" in item["parent_tags"] or "tickles" in item["parent_tags"] or "daily_notes" in item["parent_tags"]: continue
 
@@ -29,7 +29,7 @@ def filter_to_calendar(action_items, range_start, range_end):
             # If a project is scheduled, assemble a body of the project's tasks (which will
             # all be action items we should have, so we can get them by their IDs)
             if item["metadata"]["keyword"] == "PROJ":
-                body = body_for_proj(item, action_items)
+                body = body_for_proj(item, action_items_map)
             else:
                 body = item["body"] or ""
 

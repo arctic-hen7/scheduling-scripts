@@ -15,16 +15,16 @@ def filter_to_upcoming(items, until):
     and/or `deadline` dates.
     """
 
-    items = {item["id"]: item for item in items}
+    items_map = {item["id"]: item for item in items}
 
     filtered = []
-    for item in items.values():
+    for item in items:
         if item["scheduled"]:
             # This is guaranteed not to have an end datetime from the next actions filter
             scheduled = create_datetime(item["scheduled"]["date"], item["scheduled"]["time"])
 
             # Check timestamps and cross-reference with the deadline
-            if not should_surface_item(item, items):
+            if not should_surface_item(item, items_map):
                 continue
 
             # We've filtered out anything that's already been scheduled (and by doing that on
@@ -35,7 +35,7 @@ def filter_to_upcoming(items, until):
         elif item["deadline"]:
             # We have a deadline without a scheduled constraint, this should be displayed always
             # unless there's a timestamp (check validity as before)
-            if not should_surface_item(item, items):
+            if not should_surface_item(item, items_map):
                 continue
 
             filtered.append(item)

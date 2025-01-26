@@ -22,19 +22,19 @@ def format_actions_for_app(next_actions):
     Formats the given next actions for the actions app.
     """
 
-    next_actions = {action["id"]: action for action in next_actions}
+    next_actions_map = {action["id"]: action for action in next_actions}
 
     # There are finite contexts and people to choose from, so record them. Each one's value will
     # be its position were this an array (which it will be when we export).
     contexts = {}
     people = {}
     formatted_actions = []
-    for action in next_actions.values():
+    for action in next_actions:
         # Skip anything that's been scheduled, any projects, and any non-actionable items. They
         # should all be visible in the desktop systems, because there I can see the full context
         # of where they sit and work out what needs to be done. In the field, I just want to see
         # things I can *do* straight away.
-        if not should_surface_item(action, next_actions) or not action["time"] or action["keyword"] != "TODO":
+        if not should_surface_item(action, next_actions_map) or not action["time"] or action["keyword"] != "TODO":
             continue
 
         action_contexts = []

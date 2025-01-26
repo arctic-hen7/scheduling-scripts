@@ -64,12 +64,7 @@ def body_for_proj(proj_item, action_items):
     body = proj_item["body"] + "\n\n" if proj_item["body"] else ""
     task_parts = []
     for task_id, _ in proj_item["children"]:
-        if task_id in action_items:
-            task = action_items[task_id]
-        elif f"{task_id}-0" in action_items:
-            task = action_items[f"{task_id}-0"]
-        else:
-            task = None
+        task = action_items.get(task_id)
 
         if task:
             task_part = f"# TODO {task['title'][-1]}"

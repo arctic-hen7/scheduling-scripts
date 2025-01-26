@@ -8,20 +8,20 @@ def filter_to_next_actions(action_items):
     projects with timestamps, and any tasks.
     """
 
-    action_items = {item["id"]: item for item in action_items}
+    action_items_map = {item["id"]: item for item in action_items}
 
     filtered = []
-    for item in action_items.values():
+    for item in action_items:
         if item["metadata"]["keyword"]:
             if item["metadata"]["keyword"] == "PROJ":
                 # Only include projects if they have scheduled/deadline timestamps that would make
                 # them appear (otherwise they're not really *next actions*). Alternately, they
                 # might have an actual timestamp which will impact the scheduling of their children,
                 # so definitely include those!
-                if not item["metadata"]["scheduled"] and not item["metadata"]["deadline"] and not item["metadata"]["timestamp"]: 
+                if not item["metadata"]["scheduled"] and not item["metadata"]["deadline"] and not item["metadata"]["timestamp"]:
                     continue
 
-                body = body_for_proj(item, action_items)
+                body = body_for_proj(item, action_items_map)
                 # Projects don't have these, tasks do
                 time = None
                 focus = None

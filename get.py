@@ -121,9 +121,7 @@ def repeat_until(item, until):
         repeats.append(item)
 
     # But now we don't need repeater info anymore, so remove it
-    for j, repeat in enumerate(repeats):
-        repeat["id"] = f"{repeat['id']}-{j}"
-
+    for repeat in repeats:
         if repeat["metadata"]["timestamp"]:
             del repeat["metadata"]["timestamp"]["repeater"]
         if repeat["metadata"]["scheduled"]:
@@ -174,14 +172,13 @@ def get_normalised_action_items(until, opts=[]):
         item["metadata"]["closed"] = prune_inactive_ts(item["metadata"]["closed"])
 
         # Split out multiple timestamps into separate items
-        for i, ts in enumerate(item["metadata"]["timestamps"]):
+        for ts in item["metadata"]["timestamps"]:
             # Ignore any inactive main timestamps
             if not ts["active"]: continue
             del ts["active"]
 
             # Use this active main timestamp to guide a potential repeat cadence
             item_clone = copy.deepcopy(item)
-            item_clone["id"] = f"{item['id']}-{i}"
             del item_clone["metadata"]["timestamps"]
             item_clone["metadata"]["timestamp"] = ts
             expanded_items.extend(repeat_until(item_clone, until))

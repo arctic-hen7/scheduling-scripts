@@ -29,15 +29,15 @@ def filter_next_actions(next_actions, until, contexts, people, max_time, max_foc
     # We want quick indexing on these
     contexts = set(contexts)
     people = set(people)
-    next_actions = {item["id"]: item for item in next_actions}
+    next_actions_map = {item["id"]: item for item in next_actions}
 
     filtered = []
-    for item in next_actions.values():
+    for item in next_actions:
         # Skip anything that's been scheduled, any projects, and any non-actionable items. They
         # should all be visible in the desktop systems, because there I can see the full context
         # of where they sit and work out what needs to be done. In the field, I just want to see
         # things I can *do* straight away.
-        if not should_surface_item(item, next_actions) or not item["time"] or item["keyword"] != "TODO":
+        if not should_surface_item(item, next_actions_map) or not item["time"] or item["keyword"] != "TODO":
             continue
         # Skip all projects, they're not next actions and are only needed in the upcoming/urgent
         # sections
