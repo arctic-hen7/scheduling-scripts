@@ -13,6 +13,7 @@ from ..urgent import filter_to_urgent
 from ..get import get_normalised_action_items
 
 DIGEST_SCRIPT_PROMPT = "You are a helpful assistant in part of a pipeline to deliver a spoken daily digest to a user. You will be given the raw Markdown of a daily digest file containing events, daily notes (i.e. things to remember), goals for the day, week, and general goals that are shown every day, and urgent actions that need to be done during the day. You should provide a script version of this that can be spoken fluently by a text-to-speech engine. Make sure to include all the detail of the daily digest and not change anything, just reformat it so it can be spoken fluently. You should open with a cheerful \"Good morning\" or similar, and close with a positive message to have a great day."
+TTS_VOICE = "nova"
 
 def main_cli(args):
     import argparse
@@ -107,7 +108,7 @@ def main_cli(args):
         print("Generating digest audio...")
         response = client.audio.speech.create(
             model="tts-1",
-            voice="onyx",
+            voice=TTS_VOICE,
             input=completion.choices[0].message.content,
         )
         response.stream_to_file(args.audio)
