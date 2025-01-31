@@ -11,6 +11,7 @@ def get_action_items(opts):
     """
     Gets all action items from the Starling server, sending the provided extra arguments.
     """
+
     response = requests.get(f"{STARLING_API}/index/action_items/nodes", json={"conn_format": "markdown", "metadata": True, "children": True, **(opts or {})})
     if response.status_code == 200:
         return response.json()
@@ -21,6 +22,7 @@ def get_next_timestamp(timestamp):
     """
     Gets the next repeat of the given timestamp if there is one.
     """
+
     # Send the timestamp as a JSON body (adding back `active`)
     response = requests.get(f"{STARLING_API}/utils/next-timestamp", json={**timestamp, "active": True})
     if response.status_code == 200:
@@ -32,6 +34,7 @@ def ts_in_range(ts_start, ts_end, start, end):
     """
     Determines if the given timestamp is in the given range.
     """
+
     return ts_start <= end and (ts_end is None or ts_end >= start)
 
 def has_ts_before(item, until):
