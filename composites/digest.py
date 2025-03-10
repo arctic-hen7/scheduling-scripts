@@ -2,8 +2,6 @@
 
 from datetime import datetime, timedelta
 
-from dashboards.utils import format_minutes
-
 from ..goals import assemble_goals_file
 from ..cal import filter_to_calendar
 from ..daily_notes import filter_to_daily_notes
@@ -12,7 +10,7 @@ from ..upcoming import filter_to_upcoming
 from ..urgent import filter_to_urgent
 from ..get import get_normalised_action_items
 
-DIGEST_SCRIPT_PROMPT = "You are a helpful assistant in part of a pipeline to deliver a spoken daily digest to a user. You will be given the raw Markdown of a daily digest file containing events, daily notes (i.e. things to remember), goals for the day, week, and general goals that are shown every day, and urgent actions that need to be done during the day. You should provide a script version of this that can be spoken fluently by a text-to-speech engine. Make sure to include all the detail of the daily digest and not change anything, just reformat it so it can be spoken fluently. You should open with a cheerful \"Good morning\" or similar, and close with a positive message to have a great day."
+DIGEST_SCRIPT_PROMPT = "You are a fun assistant in part of a pipeline to deliver a spoken daily digest to me, a founder. You will be given the raw Markdown of a daily digest file containing events, daily notes (i.e. things to remember), goals for the day, week, and general goals that are shown every day, and urgent actions that need to be done during the day (which might include problems/projects to be worked on). You should provide a script version of this that can be spoken fluently by a text-to-speech engine. Make sure to include all the detail of the daily digest and not change anything, just reformat it so it can be spoken fluently. You should open with a cheerful \"Good morning\" or similar, and close with a positive message to have a great day."
 TTS_VOICE = "nova"
 
 def main_cli(args):
@@ -36,7 +34,7 @@ def main_cli(args):
     cal_items = filter_to_calendar(action_items, date, until)
     daily_notes = filter_to_daily_notes(action_items, date, until)
     next_actions = filter_to_next_actions(action_items)
-    upcoming = filter_to_upcoming(next_actions, until)
+    upcoming = filter_to_upcoming(next_actions, until, "all")
     urgent = filter_to_urgent(upcoming, date, until)
     goals_md = assemble_goals_file(date)
 
@@ -78,11 +76,11 @@ def main_cli(args):
     for action in urgent:
         if action["keyword"] == "PROJ":
             proj_str = "(Project) "
-            details_str = ""
+        elif action["keyword"] == "PROB":
+            proj_str = "(Problem) "
         else:
             proj_str = ""
-            details_str = f" ({[ 'minimal', 'low', 'medium', 'high' ][action['focus']]} focus; {format_minutes(action['time'])}; context: {', '.join(action['context']) if action['context'] else 'none'})"
-        urgent_md += f"- {proj_str}{action['title']}{details_str}\n"
+        urgent_md += f"- {proj_str}{action['title']}\n"
 
     # Format the goals for fitting into the broader file
     goals_md = "## Goals\n\n" + goals_md.replace("# ", "### ")
@@ -103,7 +101,7 @@ def main_cli(args):
                     "content": digest
                 }
             ],
-            temperature=0.3
+            temperature=0.7
         )
         print("Generating digest audio...")
         response = client.audio.speech.create(

@@ -17,9 +17,9 @@ def display_actions(actions, current_date):
     """
 
     for idx, action in enumerate(actions):
-        if action["keyword"] == "PROJ":
+        if action.get("keyword") == "PROJ":
             yield Text.from_markup(f"→ [bold][orange_red1 italic]Project: [/orange_red1 italic]{action['title']}[/bold]")
-        elif action["keyword"] == "PROB":
+        elif action.get("keyword") == "PROB":
             yield Text.from_markup(f"→ [bold][purple italic]Problem: [/purple italic]{action['title']}[/bold]")
         else:
             yield Text(f"→ {action['title']}", style="bold")
@@ -33,11 +33,11 @@ def display_actions(actions, current_date):
             deadline = format_date(action["deadline"]["date"], action["deadline"]["time"], current_date, connective="on")
             yield Text.from_markup(f"  Due [bold red]{deadline}[/bold red]", style="italic")
 
-        if action["priority"] != DEFAULT_PRIORITY:
+        if action.get("priority") is not None and action.get("priority") != DEFAULT_PRIORITY:
             yield Text.from_markup(f"  Priority: [bold green4]{format_priority(action['priority'])}[/bold green4]", style="italic")
 
         # Only add these metadata for actual tasks (context for problems as well)
-        if action["keyword"] == "TODO" or action["keyword"] == "PROB":
+        if action.get("keyword") == "TODO" or action.get("keyword") == "PROB":
             context_str = ", ".join(action["context"]) if action["context"] else "none"
             yield Text.from_markup(f"  Context: [bold dodger_blue1]{context_str}[/bold dodger_blue1]", style="italic")
 

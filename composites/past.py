@@ -37,7 +37,7 @@ def main_cli(args):
     daily_notes = filter_to_daily_notes(action_items, None, until)
     dates = filter_to_dates(action_items, until)
     tickles = filter_to_tickles(action_items, until)
-    waiting_items = filter_to_upcoming(filter_to_waiting(action_items), until)
+    waiting_items = filter_to_upcoming(filter_to_waiting(action_items), until, "all")
 
     cal_view = Panel(display_calendar(cal_items, daily_notes), title="Calendar")
     tickles_view = Panel(display_tickles(tickles, date.date()), title="Tickles")

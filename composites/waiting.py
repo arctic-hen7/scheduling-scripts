@@ -23,7 +23,7 @@ def main_cli(args):
 
     action_items = get_normalised_action_items(until, ["body"])
     waiting_items = filter_to_waiting(action_items)
-    upcoming = filter_to_upcoming(waiting_items, until)
+    upcoming = filter_to_upcoming(waiting_items, until, "all")
 
     display = display_actions(upcoming, date.date())
     rich_print(display)

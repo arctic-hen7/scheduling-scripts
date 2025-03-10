@@ -37,9 +37,9 @@ def main_cli(args):
     action_items = get_normalised_action_items(until, ["body"])
     dates = filter_to_dates(action_items, until)
     next_actions = filter_to_next_actions(action_items)
-    upcoming = filter_to_upcoming(next_actions, until)
+    upcoming = filter_to_upcoming(next_actions, until, "all")
     tickles = filter_to_tickles(action_items, until)
-    waiting_items = filter_to_upcoming(filter_to_waiting(action_items), until)
+    waiting_items = filter_to_upcoming(filter_to_waiting(action_items), until, "all")
 
     upcoming_view = Panel(display_actions(upcoming, date.date()), title="Upcoming Actions")
     tickles_view = Panel(display_tickles(tickles, date.date()), title="Tickles")
