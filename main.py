@@ -35,7 +35,7 @@ ARGS = {
         "actions_app": actions_app.main_cli,
         "goals": goals.main_cli,
 
-        "dashboards": {
+        "dashboard": {
             "actions": d_actions.main_cli,
         }
     },

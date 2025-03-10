@@ -3,7 +3,7 @@
 from datetime import datetime
 from .utils import create_datetime, dump_json, load_json, should_surface_item
 
-def filter_to_upcoming(items, until):
+def filter_to_upcoming(items, until, ty):
     """
     Filters the given next actions down to those which are upcoming with respect to the given date.
     Specifically, this will surface items with a scheduled date before the given cutoff, as well as
@@ -19,6 +19,9 @@ def filter_to_upcoming(items, until):
 
     filtered = []
     for item in items:
+        if ty == "tasks" and item["keyword"] != "TODO": continue
+        if ty == "problems" and item["keyword"] != "PROB": continue
+
         if item["scheduled"]:
             # This is guaranteed not to have an end datetime from the next actions filter
             scheduled = create_datetime(item["scheduled"]["date"], item["scheduled"]["time"])
@@ -45,9 +48,9 @@ def filter_to_upcoming(items, until):
         key=lambda item:
             (
                 item["scheduled"]["date"] if item["scheduled"] else item["deadline"]["date"],
-                item["scheduled"]["time"] if item["scheduled"] else item["deadline"]["time"],
+                item["scheduled"]["time"] or "" if item["scheduled"] else item["deadline"]["time"] or "",
                 item["deadline"]["date"] if item["deadline"] else "",
-                item["deadline"]["time"] if item["deadline"] else "",
+                item["deadline"]["time"] or "" if item["deadline"] else "",
                 item["title"]
             )
     )
@@ -58,10 +61,14 @@ def main_cli(args):
     import argparse
     parser = argparse.ArgumentParser(description="Filter by deadline/scheduled dates to upcoming items.", prog="upcoming")
     parser.add_argument("date", type=str, help="The cutoff date to surface scheduled items up until.")
+    ty_group = parser.add_mutually_exclusive_group()
+    ty_group.add_argument("--problems", action="store_true", help="Only show problems.")
+    ty_group.add_argument("--tasks", action="store_true", help="Only show tasks.")
 
     args = parser.parse_args(args)
     until = datetime.strptime(args.date, "%Y-%m-%d")
     until.replace(hour=23, minute=59, second=59)
+    ty = "problems" if args.problems else "tasks" if args.tasks else "all"
 
     items = load_json()
-    dump_json(filter_to_upcoming(items, until))
+    dump_json(filter_to_upcoming(items, until, ty))

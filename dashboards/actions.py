@@ -17,7 +17,13 @@ def display_actions(actions, current_date):
     """
 
     for idx, action in enumerate(actions):
-        yield Text(f"→ {action['title']}", style="bold")
+        if action["keyword"] == "PROJ":
+            yield Text.from_markup(f"→ [bold][orange_red1 italic]Project: [/orange_red1 italic]{action['title']}[/bold]")
+        elif action["keyword"] == "PROB":
+            yield Text.from_markup(f"→ [bold][purple italic]Problem: [/purple italic]{action['title']}[/bold]")
+        else:
+            yield Text(f"→ {action['title']}", style="bold")
+
         if action.get("timestamp"):
             yield Text.from_markup("  [italic]Has a timestamp attached.[/italic]")
         if action["scheduled"]:
@@ -27,15 +33,16 @@ def display_actions(actions, current_date):
             deadline = format_date(action["deadline"]["date"], action["deadline"]["time"], current_date, connective="on")
             yield Text.from_markup(f"  Due [bold red]{deadline}[/bold red]", style="italic")
 
-        # Only add these metadata for actual tasks
-        if action.get("time"):
-            focus_str = [ "minimal", "low", "medium", "high" ][action["focus"]]
-            time_str = format_minutes(action["time"])
+        # Only add these metadata for actual tasks (context for problems as well)
+        if action["keyword"] == "TODO" or action["keyword"] == "PROB":
             context_str = ", ".join(action["context"]) if action["context"] else "none"
-
             yield Text.from_markup(f"  Context: [bold dodger_blue1]{context_str}[/bold dodger_blue1]", style="italic")
-            yield Text.from_markup(f"  Focus: [bold green3]{focus_str}[/bold green3]", style="italic")
-            yield Text.from_markup(f"  Time: [bold blue]{time_str}[/bold blue]", style="italic")
+
+            if action["keyword"] == "TODO":
+                focus_str = [ "minimal", "low", "medium", "high" ][action["focus"]]
+                time_str = format_minutes(action["time"])
+                yield Text.from_markup(f"  Focus: [bold green3]{focus_str}[/bold green3]", style="italic")
+                yield Text.from_markup(f"  Time: [bold blue]{time_str}[/bold blue]", style="italic")
 
         if action.get("sent"):
             yield Text.from_markup(f"  Sent [bold dodger_blue1]{format_date(action['sent'], None, current_date, connective='on')}[/bold dodger_blue1]", style="italic")

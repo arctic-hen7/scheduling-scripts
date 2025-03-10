@@ -34,14 +34,18 @@ def format_actions_for_app(next_actions):
         # should all be visible in the desktop systems, because there I can see the full context
         # of where they sit and work out what needs to be done. In the field, I just want to see
         # things I can *do* straight away.
-        if not should_surface_item(action, next_actions_map) or not action["time"] or action["keyword"] != "TODO":
+        if not should_surface_item(action, next_actions_map) or action["keyword"] == "PROJ":
             continue
 
         action_contexts = []
         action_people = []
 
         html = "<pre>"
-        html += f"<strong>→ {action['title']}</strong>"
+        # No projects
+        if action["keyword"] == "PROB":
+            html += f"<strong>→ <i class='probMarker'>Problem:</i> {action['title']}</strong>"
+        else:
+            html += f"<strong>→ {action['title']}</strong>"
         if action.get("timestamp"):
             html += "\n  <i>Has a timestamp attached.</i>"
         if action["scheduled"]:
@@ -50,17 +54,18 @@ def format_actions_for_app(next_actions):
         if action["deadline"]:
             html += "\n  <i>Due <strong class='deadline'>{{ deadline }}</strong></i>"
 
-        focus_str = [ "minimal", "low", "medium", "high" ][action["focus"]]
-        time_str = format_minutes(action["time"])
         context_str = ", ".join(action["context"]) if action["context"] else "none"
         for ctx in action["context"] or []:
             if ctx not in contexts:
                 contexts[ctx] = len(contexts)
             action_contexts.append(contexts[ctx])
-
         html += f"\n  <i>Context: <strong class='context'>{context_str}</strong></i>"
-        html += f"\n  <i>Focus: <strong class='focus'>{focus_str}</strong></i>"
-        html += f"\n  <i>Time: <strong class='time'>{time_str}</strong></i>"
+
+        if action["keyword"] == "TODO":
+            focus_str = [ "minimal", "low", "medium", "high" ][action["focus"]]
+            time_str = format_minutes(action["time"])
+            html += f"\n  <i>Focus: <strong class='focus'>{focus_str}</strong></i>"
+            html += f"\n  <i>Time: <strong class='time'>{time_str}</strong></i>"
 
         if action["people"]:
             html += "\n  <i>People needed:</i>"
@@ -77,7 +82,7 @@ def format_actions_for_app(next_actions):
 
         html += "</pre>"
         # Minimal format to reduce data needs
-        formatted_actions.append([html, jsify_ts(action.get("scheduled")), jsify_ts(action.get("deadline")), action_contexts, action_people, action["focus"], action["time"]])
+        formatted_actions.append([html, jsify_ts(action.get("scheduled")), jsify_ts(action.get("deadline")), action_contexts, action_people, action["focus"], action["time"], action["keyword"]])
 
     formatted_actions.sort(
         key=lambda item:

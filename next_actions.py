@@ -1,6 +1,6 @@
 # Filters the given action items down to those which qualify as "next actions".
 
-from .utils import associated_people, body_for_proj, create_datetime, dump_json, load_json, validate_focus, validate_time, validate_planning_ts
+from .utils import associated_people, body_for_proj, create_datetime, dump_json, load_json, validate_focus, validate_time, validate_planning_ts, get_priority
 
 def filter_to_next_actions(action_items):
     """
@@ -16,9 +16,9 @@ def filter_to_next_actions(action_items):
             if item["metadata"]["keyword"] == "PROJ":
                 # Only include projects if they have scheduled/deadline timestamps that would make
                 # them appear (otherwise they're not really *next actions*). Alternately, they
-                # might have an actual timestamp which will impact the scheduling of their children,
-                # so definitely include those!
-                if not item["metadata"]["scheduled"] and not item["metadata"]["deadline"] and not item["metadata"]["timestamp"]:
+                # might have an actual timestamp or priority which will impact the scheduling of
+                # their children, so definitely include those!
+                if not item["metadata"]["scheduled"] and not item["metadata"]["deadline"] and not item["metadata"]["timestamp"] and not item["metadata"]["priority"]:
                     continue
 
                 body = body_for_proj(item, action_items_map)
@@ -27,6 +27,13 @@ def filter_to_next_actions(action_items):
                 focus = None
                 people = None
                 context = None
+            elif item["metadata"]["keyword"] == "PROB":
+                # Problems are like tasks, but don't have time/focus
+                body = item["body"] or ""
+                time = None
+                focus = None
+                people = associated_people(item)
+                context = item["tags"]
             else:
                 body = item["body"] or ""
                 time = validate_time(item["metadata"]["properties"].get("TIME"), item["id"])
@@ -36,6 +43,7 @@ def filter_to_next_actions(action_items):
 
             scheduled = validate_planning_ts(item["metadata"]["scheduled"], item["id"])
             deadline = validate_planning_ts(item["metadata"]["deadline"], item["id"])
+            priority = get_priority(item, action_items_map)
 
             # Sanity check that the scheduled date is before the deadline date
             scheduled_dt = create_datetime(scheduled["date"], scheduled["time"]) if scheduled else None
@@ -56,6 +64,7 @@ def filter_to_next_actions(action_items):
                 "context": context,
                 "time": time,
                 "focus": focus,
+                "priority": priority,
             }
 
             filtered.append(next_action)

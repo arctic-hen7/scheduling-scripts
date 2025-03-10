@@ -13,6 +13,12 @@
 .focus {
     color: #00d700;
 }
+.projMarker {
+    color: #ff5f00;
+}
+.probMarker {
+    color: #af00ff;
+}
 
 pre {
     white-space: pre-wrap;

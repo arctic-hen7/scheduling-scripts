@@ -3,6 +3,7 @@ import json
 import sys
 
 STARLING_API="http://localhost:3000/"
+DEFAULT_PRIORITY = 10
 
 def parse_range_str(range_str):
     """
@@ -203,3 +204,27 @@ def should_surface_item(item, items):
         return False
     else:
         return True
+
+def get_priority(item, items):
+    """
+    Gets the priority of the given item, inheriting any higher priorities from up the chain.
+    """
+
+    # Higher numbers are less important, so infinity is the default least
+    active_item = item
+    highest_priority = float("inf")
+    while True:
+        priority = active_item["metadata"]["priority"]
+        try:
+            priority = int(priority) if priority is not None else float("inf")
+        except ValueError:
+            raise ValueError(f"Invalid priority value on node '{item['id']}': {priority}")
+        if priority < highest_priority:
+            highest_priority = priority
+
+        active_item = items.get(active_item["parent_id"])
+        if not active_item:
+            break
+
+    return highest_priority
+

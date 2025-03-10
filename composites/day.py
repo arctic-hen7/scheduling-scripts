@@ -35,7 +35,7 @@ def main_cli(args):
     cal_items = filter_to_calendar(action_items, date, until)
     daily_notes = filter_to_daily_notes(action_items, date, until)
     next_actions = filter_to_next_actions(action_items)
-    upcoming = filter_to_upcoming(next_actions, until)
+    upcoming = filter_to_upcoming(next_actions, until, "all")
     dates = filter_to_dates(action_items, until)
 
     cal_view = Panel(display_calendar(cal_items, daily_notes), title="Calendar")

@@ -28,6 +28,7 @@ def filter_to_calendar(action_items, range_start, range_end):
         if ts and ts_in_range(ts, range_start, range_end):
             # If a project is scheduled, assemble a body of the project's tasks (which will
             # all be action items we should have, so we can get them by their IDs)
+            # TODO: Isn't this done for us by `next_actions.py`?
             if item["metadata"]["keyword"] == "PROJ":
                 body = body_for_proj(item, action_items_map)
             else:
@@ -40,7 +41,9 @@ def filter_to_calendar(action_items, range_start, range_end):
                 "location": item["metadata"]["properties"].get("LOCATION"),
                 "people": associated_people(item),
                 "start": ts["start"],
-                "end": ts["end"]
+                "end": ts["end"],
+                # Never used for events proper, but allows displaying problems nicely
+                "keyword": item["metadata"]["keyword"],
             }
             cals.append(cal_item)
 

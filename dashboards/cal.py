@@ -100,7 +100,12 @@ def display_calendar(cal_items, daily_notes):
             else:
                 time_str = "all day"
 
-            yield Text.from_markup(f"→ {item['title']} [bold yellow]{time_str}[/bold yellow]")
+            if item["keyword"] == "PROJ":
+                yield Text.from_markup(f"→ [bold][orange_red1 italic]Project: [/orange_red1 italic]{item['title']} [yellow]{time_str}[/yellow][/bold]")
+            elif item["keyword"] == "PROB":
+                yield Text.from_markup(f"→ [bold][purple italic]Problem: [/purple italic]{item['title']} [yellow]{time_str}[/yellow][/bold]")
+            else:
+                yield Text.from_markup(f"→ [bold]{item['title']} [yellow]{time_str}[/yellow][/bold]")
 
             if item["location"]:
                 yield Text.from_markup(f"  Location: [bold dodger_blue1]{item['location']}[/bold dodger_blue1]", style="italic")

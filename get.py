@@ -166,7 +166,7 @@ def get_normalised_action_items(until, opts=[]):
     for item in items:
         # Skip completed items (still indexed!)
         keyword = item["metadata"]["keyword"]
-        if keyword and keyword == "DONE":
+        if keyword and (keyword == "DONE" or keyword == "CONT"):
             continue
 
         # Remove inactive planning timestamps

@@ -15,15 +15,19 @@ def main_cli(args):
     parser = argparse.ArgumentParser(description="Filter by deadline/scheduled dates to upcoming items.", prog="upcoming")
     parser.add_argument("-d", "--date", type=str, help="The current date.")
     parser.add_argument("-u", "--until", type=str, help="The cutoff date to surface scheduled items up until.")
+    ty_group = parser.add_mutually_exclusive_group()
+    ty_group.add_argument("--problems", action="store_true", help="Only show problems.")
+    ty_group.add_argument("--tasks", action="store_true", help="Only show tasks.")
 
     args = parser.parse_args(args)
     date = datetime.strptime(args.date, "%Y-%m-%d") if args.date else datetime.now()
     until = datetime.strptime(args.until, "%Y-%m-%d") if args.until else date + timedelta(days=EXPAND_ADVANCE_DAYS)
     until.replace(hour=23, minute=59, second=59)
+    ty = "problems" if args.problems else "tasks" if args.tasks else "all"
 
     action_items = get_normalised_action_items(until, ["body"])
     next_actions = filter_to_next_actions(action_items)
-    upcoming = filter_to_upcoming(next_actions, until)
+    upcoming = filter_to_upcoming(next_actions, until, ty)
 
     display = display_actions(upcoming, date.date())
     rich_print(display)

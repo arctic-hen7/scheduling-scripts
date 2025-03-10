@@ -19,7 +19,6 @@ const formatDate = (dateStr, timeStr, currentDate, connective) => {
     const daysDifference = Math.floor(
         (date - currentDate) / (1000 * 60 * 60 * 24),
     );
-    console.log(date, currentDate, daysDifference);
 
     let dayStr = "";
     if (daysDifference === 0) {
@@ -55,8 +54,16 @@ const getUrgent = (date, proximityDays) => {
 
     const urgent = [];
     for (
-        const [html, scheduled, deadline, _ctxs, _people, _focus, _time]
-            of actions
+        const [
+            html,
+            scheduled,
+            deadline,
+            _ctxs,
+            _people,
+            _focus,
+            _time,
+            _keyword,
+        ] of actions
     ) {
         if (!deadline) {
             continue;
@@ -128,7 +135,7 @@ const parseTimeStr = (timeStr) => {
 };
 
 // Same as `filter.py:filter_next_actions`.
-const filter = (date, contextsArr, peopleArr, maxTimeStr, maxFocus) => {
+const filter = (date, contextsArr, peopleArr, maxTimeStr, maxFocus, ty) => {
     date.setHours(0, 0, 0, 0);
 
     const until = new Date(date);
@@ -144,9 +151,24 @@ const filter = (date, contextsArr, peopleArr, maxTimeStr, maxFocus) => {
 
     const filtered = [];
     for (
-        const [html, scheduled, deadline, ctxs, actionPeople, focus, time]
-            of actions
+        const [
+            html,
+            scheduled,
+            deadline,
+            ctxs,
+            actionPeople,
+            focus,
+            time,
+            keyword,
+        ] of actions
     ) {
+        if (ty == "tasks" && keyword != "TODO") {
+            continue;
+        }
+        if (ty == "problems" && keyword != "PROB") {
+            continue;
+        }
+
         if (contexts) {
             let weHaveAll = true;
             let itemHasOne = false;
@@ -237,8 +259,13 @@ const doFilter = () => {
     const people = Array.from(
         document.getElementById("peopleSelect").selectedOptions,
     ).map((option) => option.value);
-
-    console.log(maxFocus);
+    let ty = "all";
+    for (const radio of document.getElementsByName("ty")) {
+        if (radio.checked) {
+            ty = radio.value;
+            break;
+        }
+    }
 
     const filtered = filter(
         new Date(),
@@ -246,6 +273,7 @@ const doFilter = () => {
         people.length === 0 ? null : people,
         maxTimeStr ? maxTimeStr : null,
         maxFocus != -1 ? maxFocus : null,
+        ty,
     );
     displayActions(filtered);
 };
