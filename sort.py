@@ -11,9 +11,9 @@ def sort_actions(actions):
         key=lambda item:
             (
                 item["deadline"]["date"] if item["deadline"] else "9999",
-                item["deadline"]["time"] if item["deadline"] else "9999",
+                item["deadline"]["time"] or "9999" if item["deadline"] else "9999",
                 item["scheduled"]["date"] if item["scheduled"] else "9999",
-                item["scheduled"]["time"] if item["scheduled"] else "9999",
+                item["scheduled"]["time"] or "9999" if item["scheduled"] else "9999",
                 item.get("priority") or DEFAULT_PRIORITY, # Lower is better
                 item["title"]
             )
