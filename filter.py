@@ -3,6 +3,7 @@
 
 from datetime import datetime
 from .utils import dump_json, load_json, validate_time, validate_focus, should_surface_item
+from .sort import sort_actions
 
 def filter_next_actions(next_actions, until, contexts, people, max_time, max_focus, ty):
     # TODO: sorting by relevance, somehow...
@@ -82,19 +83,7 @@ def filter_next_actions(next_actions, until, contexts, people, max_time, max_foc
 
         filtered.append(item)
 
-    # Sort by title
-    filtered.sort(
-        key=lambda item:
-            (
-                item["scheduled"]["date"] if item["scheduled"] else item["deadline"]["date"] if item["deadline"] else "9999",
-                item["scheduled"]["time"] if item["scheduled"] else item["deadline"]["time"] if item["deadline"] else "9999",
-                item["deadline"]["date"] if item["deadline"] else "9999",
-                item["deadline"]["time"] if item["deadline"] else "9999",
-                item["title"]
-            )
-    )
-
-    return filtered
+    return sort_actions(filtered)
 
 def main_cli(args):
     import argparse

@@ -1,6 +1,8 @@
 # Script that filters next actions/waiting-for items down to those that are upcoming.
 
 from datetime import datetime
+
+from sort import sort_actions
 from .utils import create_datetime, dump_json, load_json, should_surface_item
 
 def filter_to_upcoming(items, until, ty):
@@ -44,18 +46,7 @@ def filter_to_upcoming(items, until, ty):
             filtered.append(item)
 
     # Sort by scheduled/deadline date (whichever the item has, scheduled first), and then deadline
-    filtered.sort(
-        key=lambda item:
-            (
-                item["scheduled"]["date"] if item["scheduled"] else item["deadline"]["date"],
-                item["scheduled"]["time"] or "" if item["scheduled"] else item["deadline"]["time"] or "",
-                item["deadline"]["date"] if item["deadline"] else "",
-                item["deadline"]["time"] or "" if item["deadline"] else "",
-                item["title"]
-            )
-    )
-
-    return filtered
+    return sort_actions(filtered)
 
 def main_cli(args):
     import argparse

@@ -7,7 +7,7 @@ from rich.padding import Padding
 from rich.text import Text
 from rich import print as rich_print
 from .utils import LeftJustifiedHeading, format_date, format_minutes
-from ..utils import load_json
+from ..utils import DEFAULT_PRIORITY, load_json, format_priority
 
 @group()
 def display_actions(actions, current_date):
@@ -32,6 +32,9 @@ def display_actions(actions, current_date):
         if action["deadline"]:
             deadline = format_date(action["deadline"]["date"], action["deadline"]["time"], current_date, connective="on")
             yield Text.from_markup(f"  Due [bold red]{deadline}[/bold red]", style="italic")
+
+        if action["priority"] != DEFAULT_PRIORITY:
+            yield Text.from_markup(f"  Priority: [bold green4]{format_priority(action['priority'])}[/bold green4]", style="italic")
 
         # Only add these metadata for actual tasks (context for problems as well)
         if action["keyword"] == "TODO" or action["keyword"] == "PROB":

@@ -5,7 +5,9 @@
 
 import json
 from pathlib import Path
-from .utils import load_json, should_surface_item
+
+from sort import sort_actions
+from .utils import DEFAULT_PRIORITY, format_priority, load_json, should_surface_item, format_priority
 from .dashboards.utils import format_minutes
 
 def jsify_ts(ts):
@@ -24,11 +26,8 @@ def format_actions_for_app(next_actions):
 
     next_actions_map = {action["id"]: action for action in next_actions}
 
-    # There are finite contexts and people to choose from, so record them. Each one's value will
-    # be its position were this an array (which it will be when we export).
-    contexts = {}
-    people = {}
-    formatted_actions = []
+    # Filter and sort first to avoid having to duplicate sort logic with weird JS indices
+    filtered = []
     for action in next_actions:
         # Skip anything that's been scheduled, any projects, and any non-actionable items. They
         # should all be visible in the desktop systems, because there I can see the full context
@@ -36,6 +35,17 @@ def format_actions_for_app(next_actions):
         # things I can *do* straight away.
         if not should_surface_item(action, next_actions_map) or action["keyword"] == "PROJ":
             continue
+
+        filtered.append(action)
+
+    next_actions = sort_actions(filtered)
+
+    # There are finite contexts and people to choose from, so record them. Each one's value will
+    # be its position were this an array (which it will be when we export).
+    contexts = {}
+    people = {}
+    formatted_actions = []
+    for action in next_actions:
 
         action_contexts = []
         action_people = []
@@ -53,6 +63,9 @@ def format_actions_for_app(next_actions):
             html += "\n  <i>Scheduled <strong class='scheduled'>{{ scheduled }}</strong></i>"
         if action["deadline"]:
             html += "\n  <i>Due <strong class='deadline'>{{ deadline }}</strong></i>"
+
+        if action["priority"] != DEFAULT_PRIORITY:
+            html += f"\n  <i>Priority: <strong class='priority'>{format_priority(action['priority'])}</strong></i>"
 
         context_str = ", ".join(action["context"]) if action["context"] else "none"
         for ctx in action["context"] or []:
@@ -84,18 +97,18 @@ def format_actions_for_app(next_actions):
         # Minimal format to reduce data needs
         formatted_actions.append([html, jsify_ts(action.get("scheduled")), jsify_ts(action.get("deadline")), action_contexts, action_people, action["focus"], action["time"], action["keyword"]])
 
-    formatted_actions.sort(
-        key=lambda item:
-            (
-                # Use `9999` when we don't have any scheduled/deadline date so more urgent things
-                # appear first
-                item[1][0] if item[1] else item[2][0] if item[2] else "9999",
-                item[1][1] if item[1] else item[2][1] if item[2] else "9999",
-                item[2][0] if item[2] else "9999",
-                item[2][1] if item[2] else "9999",
-                item[0] # This is the HTML, not the title, but the first thing is the title
-            )
-    )
+    # formatted_actions.sort(
+    #     key=lambda item:
+    #         (
+    #             # Use `9999` when we don't have any scheduled/deadline date so more urgent things
+    #             # appear first
+    #             item[1][0] if item[1] else item[2][0] if item[2] else "9999",
+    #             item[1][1] if item[1] else item[2][1] if item[2] else "9999",
+    #             item[2][0] if item[2] else "9999",
+    #             item[2][1] if item[2] else "9999",
+    #             item[0] # This is the HTML, not the title, but the first thing is the title
+    #         )
+    # )
     return [list(contexts.keys()), list(people.keys()), formatted_actions]
 
 def produce_actions_app(data):

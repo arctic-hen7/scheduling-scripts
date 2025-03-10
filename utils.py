@@ -212,11 +212,11 @@ def get_priority(item, items):
 
     # Higher numbers are less important, so infinity is the default least
     active_item = item
-    highest_priority = float("inf")
+    highest_priority = DEFAULT_PRIORITY
     while True:
         priority = active_item["metadata"]["priority"]
         try:
-            priority = int(priority) if priority is not None else float("inf")
+            priority = int(priority) if priority is not None else DEFAULT_PRIORITY
         except ValueError:
             raise ValueError(f"Invalid priority value on node '{item['id']}': {priority}")
         if priority < highest_priority:
@@ -228,3 +228,21 @@ def get_priority(item, items):
 
     return highest_priority
 
+def format_priority(priority_num):
+    """
+    Formats the given priority number into a human-readable string.
+    """
+
+    if priority_num == DEFAULT_PRIORITY:
+        return "normal"
+    elif priority_num > DEFAULT_PRIORITY:
+        return "low"
+    # YMMV!
+    elif priority_num == 1:
+        return "primary"
+    elif priority_num == 2:
+        return "secondary"
+    elif priority_num == 3:
+        return "tertiary"
+    else:
+        return f"priority {priority_num}"
